@@ -120,10 +120,27 @@
             text-align: center;
             transition: transform 0.2s;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+        }
+
+        .crown {
+            position: absolute;
+            top: -40px;
+            right: -20px;
+            font-size: 4rem;
+            filter: drop-shadow(4px 4px 0 var(--black));
+            z-index: 20;
+            transform: rotate(15deg);
+            pointer-events: none;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(15deg); }
+            50% { transform: translateY(-10px) rotate(15deg); }
         }
 
         .hero-card:hover {
@@ -246,7 +263,6 @@
             try {
                 const response = await fetch('/heroes?t=' + Date.now());
                 const heroes = await response.json();
-                console.log('Fetched heroes:', heroes);
                 renderHeroes(heroes);
                 updateRankings(heroes);
             } catch (error) {
@@ -258,12 +274,19 @@
             const container = document.getElementById('hero-container');
             container.innerHTML = '';
 
+            // 最大得票数を計算
+            const maxVotes = Math.max(...heroes.map(h => h.count));
+
             heroes.forEach(hero => {
+                const isWinner = hero.count === maxVotes && maxVotes > 0;
+                const crownHtml = isWinner ? '<div class="crown">👑</div>' : '';
+
                 const card = document.createElement('article');
                 card.className = 'hero-card';
                 card.style.borderBottom = `10px solid ${hero.color}`;
                 
                 card.innerHTML = `
+                    ${crownHtml}
                     <h2>${hero.name}</h2>
                     <button class="vote-button" onclick="vote('${hero.id}')">VOTE!</button>
                     <p class="vote-count">POW! <span id="count-${hero.id}" class="count">${hero.count}</span></p>
