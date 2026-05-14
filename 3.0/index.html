@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARVEL Hero Vote - Comic Edition</title>
+    <title>MARVEL Hero Vote - Dynamic Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,7 +18,7 @@
         body {
             background-color: var(--marvel-blue);
             background-image: radial-gradient(var(--black) 15%, transparent 16%),
-                              radial-gradient(var(--black) 15%, transparent 16%);
+                radial-gradient(var(--black) 15%, transparent 16%);
             background-size: 20px 20px;
             background-position: 0 0, 10px 10px;
             font-family: 'Oswald', sans-serif;
@@ -27,7 +28,7 @@
         }
 
         #app {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: var(--paper-color);
             padding: 40px;
@@ -57,16 +58,57 @@
             letter-spacing: 2px;
         }
 
-        header p {
+        .add-hero-section {
+            background: white;
+            border: 4px solid var(--black);
+            padding: 20px;
+            margin-bottom: 40px;
+            transform: rotate(0.5deg);
+            box-shadow: 8px 8px 0 var(--black);
+        }
+
+        .add-hero-section h2 {
+            font-family: 'Bangers', cursive;
+            margin-top: 0;
+            font-size: 2rem;
+            color: var(--marvel-red);
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="color"] {
+            border: 3px solid var(--black);
+            padding: 10px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+        }
+
+        .add-button {
+            font-family: 'Bangers', cursive;
             font-size: 1.5rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-top: 10px;
+            background: var(--marvel-yellow);
+            border: 3px solid var(--black);
+            padding: 5px 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .add-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--black);
         }
 
         .vote-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }
@@ -79,6 +121,9 @@
             transition: transform 0.2s;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .hero-card:hover {
@@ -160,46 +205,28 @@
             font-size: 0.9rem;
             opacity: 0.7;
         }
-
-        .ironman { border-bottom: 10px solid #AA0000; }
-        .captain { border-bottom: 10px solid #0000FF; }
-        .thor { border-bottom: 10px solid #777777; }
-        .spiderman { border-bottom: 10px solid #FF0000; }
-
     </style>
 </head>
+
 <body>
     <div id="app">
         <header>
             <h1>HERO VOTE!</h1>
-            <p>Choose Your Favorite Avenger!</p>
+            <p>Assemble Your Team and Vote!</p>
         </header>
 
+        <section class="add-hero-section">
+            <h2>JOIN THE AVENGERS!</h2>
+            <div class="form-group">
+                <input type="text" id="new-hero-name" placeholder="Hero Name (e.g. Hulk)">
+                <input type="color" id="new-hero-color" value="#ed1d24">
+                <button class="add-button" onclick="addHero()">RECRUIT!</button>
+            </div>
+        </section>
+
         <main>
-            <section class="vote-container">
-                <article class="hero-card ironman">
-                    <h2>Iron Man</h2>
-                    <button class="vote-button" onclick="vote('ironman')">VOTE!</button>
-                    <p class="vote-count">POW! <span id="count-ironman" class="count">0</span></p>
-                </article>
-
-                <article class="hero-card captain">
-                    <h2>Captain</h2>
-                    <button class="vote-button" onclick="vote('captain')">VOTE!</button>
-                    <p class="vote-count">BAM! <span id="count-captain" class="count">0</span></p>
-                </article>
-
-                <article class="hero-card thor">
-                    <h2>Thor</h2>
-                    <button class="vote-button" onclick="vote('thor')">VOTE!</button>
-                    <p class="vote-count">ZAP! <span id="count-thor" class="count">0</span></p>
-                </article>
-
-                <article class="hero-card spiderman">
-                    <h2>Spidey</h2>
-                    <button class="vote-button" onclick="vote('spiderman')">VOTE!</button>
-                    <p class="vote-count">THWIP! <span id="count-spiderman" class="count">0</span></p>
-                </article>
+            <section id="hero-container" class="vote-container">
+                <!-- Dynamic Content -->
             </section>
         </main>
 
@@ -210,44 +237,102 @@
         </aside>
 
         <footer>
-            <p>&copy; 2024 MARVEL FAN PROJECT. ALL RIGHTS RESERVED.</p>
+            <p>&copy; MARVEL Hero Vote - Dynamic Edition</p>
         </footer>
     </div>
 
     <script>
-        const votes = {
-            ironman: 0,
-            captain: 0,
-            thor: 0,
-            spiderman: 0
-        };
-
-        const heroNames = {
-            ironman: 'Iron Man',
-            captain: 'Captain America',
-            thor: 'Thor',
-            spiderman: 'Spider-Man'
-        };
-
-        function vote(heroId) {
-            votes[heroId]++;
-            document.getElementById('count-' + heroId).innerText = votes[heroId];
-            updateRankings();
+        async function fetchHeroes() {
+            try {
+                const response = await fetch('/heroes?t=' + Date.now());
+                const heroes = await response.json();
+                console.log('Fetched heroes:', heroes);
+                renderHeroes(heroes);
+                updateRankings(heroes);
+            } catch (error) {
+                console.error('Error loading heroes:', error);
+            }
         }
 
-        function updateRankings() {
+        function renderHeroes(heroes) {
+            const container = document.getElementById('hero-container');
+            container.innerHTML = '';
+
+            heroes.forEach(hero => {
+                const card = document.createElement('article');
+                card.className = 'hero-card';
+                card.style.borderBottom = `10px solid ${hero.color}`;
+                
+                card.innerHTML = `
+                    <h2>${hero.name}</h2>
+                    <button class="vote-button" onclick="vote('${hero.id}')">VOTE!</button>
+                    <p class="vote-count">POW! <span id="count-${hero.id}" class="count">${hero.count}</span></p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function vote(heroId) {
+            try {
+                const response = await fetch('/vote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ option: heroId })
+                });
+
+                if (response.ok) {
+                    await fetchHeroes();
+                } else {
+                    alert('Vote failed!');
+                }
+            } catch (error) {
+                console.error('Error voting:', error);
+            }
+        }
+
+        async function addHero() {
+            const nameInput = document.getElementById('new-hero-name');
+            const colorInput = document.getElementById('new-hero-color');
+            const name = nameInput.value.trim();
+            const color = colorInput.value;
+
+            if (!name) return alert('Enter a hero name!');
+
+            try {
+                const response = await fetch('/heroes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, color })
+                });
+
+                if (response.ok) {
+                    nameInput.value = '';
+                    await fetchHeroes();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to add hero!');
+                }
+            } catch (error) {
+                console.error('Error adding hero:', error);
+            }
+        }
+
+        function updateRankings(heroes) {
             const rankList = document.getElementById('rank-list');
-            const sortedHeroes = Object.keys(votes).sort((a, b) => votes[b] - votes[a]);
             
+            const sortedHeroes = [...heroes].sort((a, b) => b.count - a.count);
+
             rankList.innerHTML = '';
-            sortedHeroes.forEach((heroId, index) => {
+            sortedHeroes.forEach((hero, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = '<span>#' + (index + 1) + ' ' + heroNames[heroId] + '</span> <span>' + votes[heroId] + ' VOTES</span>';
+                li.innerHTML = `<span>#${index + 1} ${hero.name}</span> <span>${hero.count} VOTES</span>`;
                 rankList.appendChild(li);
             });
         }
 
-        updateRankings();
+        // Initial Load
+        fetchHeroes();
     </script>
 </body>
+
 </html>
